@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-700">Sign Up</h1>
+        <form id="signup-form" class="space-y-4">
+            <div>
+                <label for="name" class="block text-gray-600">Name:</label>
+                <input type="text" id="name" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <div>
+                <label for="email" class="block text-gray-600">Email:</label>
+                <input type="email" id="email" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <div>
+                <label for="password" class="block text-gray-600">Password:</label>
+                <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <div>
+                <label for="anime1" class="block text-gray-600">Favorite Anime 1:</label>
+                <input type="text" id="anime1" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="anime2" class="block text-gray-600">Favorite Anime 2:</label>
+                <input type="text" id="anime2" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <p id="error-message" class="text-red-500 text-sm"></p>
+
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                Sign Up
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("signup-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const anime1 = document.getElementById("anime1").value;
+            const anime2 = document.getElementById("anime2").value;
+
+            // Check if email already exists
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            if (users.some(user => user.email === email)) {
+                document.getElementById("error-message").textContent = "Email already exists.";
+                return;
+            }
+
+            // Validate password (at least 8 chars, 1 uppercase, 1 number)
+            const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            if (!passwordPattern.test(password)) {
+                document.getElementById("error-message").textContent = "Password must be 8 characters long, contain at least 1 uppercase letter and 1 number.";
+                return;
+            }
+
+            // Save the user details in localStorage
+            users.push({
+                name,
+                email,
+                password,
+                animes: [anime1, anime2].filter(anime => anime)
+            });
+            localStorage.setItem("users", JSON.stringify(users));
+
+            // Navigate to login page
+            window.location.href = "login.html";
+        });
+    </script>
+</body>
+</html>

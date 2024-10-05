@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-700">Your Anime List</h1>
+
+        <!-- Anime List Section -->
+        <ul id="anime-list" class="list-disc pl-5 space-y-3 mb-6">
+            <!-- Dynamically filled with anime items -->
+        </ul>
+
+        <h2 class="text-2xl font-semibold text-gray-600 mb-4">Add a New Anime</h2>
+
+        <!-- Add Anime Form -->
+        <form id="add-anime-form" class="space-y-4">
+            <div>
+                <label for="anime-name" class="block text-gray-600">Anime Name:</label>
+                <input type="text" id="anime-name" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                Add Anime
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        if (!loggedInUser) {
+            window.location.href = "login.html";
+        }
+
+        // Display current user's anime list
+        const animeList = document.getElementById("anime-list");
+        function displayAnime() {
+            animeList.innerHTML = '';
+            loggedInUser.animes.forEach((anime, index) => {
+                const li = document.createElement("li");
+                li.classList.add("flex", "justify-between", "items-center", "bg-gray-100", "p-2", "rounded-lg", "shadow-sm");
+                li.innerHTML = `
+                    <span>${anime}</span>
+                    <div>
+                        <button onclick="editAnime(${index})" class="bg-yellow-400 text-white py-1 px-3 rounded-md hover:bg-yellow-500 mr-2">Edit</button>
+                        <button onclick="deleteAnime(${index})" class="bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600">Delete</button>
+                    </div>
+                `;
+                animeList.appendChild(li);
+            });
+        }
+        displayAnime();
+
+        // Add anime
+        document.getElementById("add-anime-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const animeName = document.getElementById("anime-name").value;
+            loggedInUser.animes.push(animeName);
+            localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+
+            // Update the global users array
+            const userIndex = users.findIndex(user => user.email === loggedInUser.email);
+            users[userIndex] = loggedInUser;
+            localStorage.setItem("users", JSON.stringify(users));
+
+            displayAnime();
+        });
+
+        // Edit anime
+        function editAnime(index) {
+            const newAnimeName = prompt("Edit Anime:", loggedInUser.animes[index]);
+            if (newAnimeName) {
+                loggedInUser.animes[index] = newAnimeName;
+                localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+
+                const userIndex = users.findIndex(user => user.email === loggedInUser.email);
+                users[userIndex] = loggedInUser;
+                localStorage.setItem("users", JSON.stringify(users));
+
+                displayAnime();
+            }
+        }
+
+        // Delete anime
+        function deleteAnime(index) {
+            loggedInUser.animes.splice(index, 1);
+            localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+
+            const userIndex = users.findIndex(user => user.email === loggedInUser.email);
+            users[userIndex] = loggedInUser;
+            localStorage.setItem("users", JSON.stringify(users));
+
+            displayAnime();
+        }
+    </script>
+</body>
+</html>
